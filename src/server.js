@@ -14,17 +14,18 @@ createServer(async (req, res) => {
             switch (endpoint) {
                 case 'GET:/blockchain':
                     results = await liste(req, res, url)
-                    console.log(`\x1b[32m Resultat du GET : ${results}`)
+                    // console.log(`\x1b[32m Resultat du GET : ${results}`)
                     break
                 case 'POST:/blockchain':
                     results = await create(req, res)
-                    console.log(`\x1b[35m Resultat du POST : ${results}`)
+                    // console.log(`\x1b[35m Resultat du POST : ${results}`)
                     break
                 default :
                     res.writeHead(404)
             }
             if (results) {
-                console.log("RESULTS : ", results)
+                // const resultJson = JSON.parse(results)
+                // console.log("RESULT JSON : ", resultJson)
                 res.write(JSON.stringify(results))
             }
         } catch (erreur) {

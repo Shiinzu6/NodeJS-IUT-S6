@@ -48,11 +48,17 @@ export async function findBlock(partialBlock) {
  * @return {Promise<Block|null>}
  */
 export async function findLastBlock() {
-    // A coder
-    const currentBlocks = await findBlocks();
-    const currentBlocksJSON = JSON.parse(currentBlocks);
-    const lastBlock = currentBlocksJSON[Object.keys(currentBlocksJSON).sort().pop()];
-    return lastBlock
+    const currentBlocksString = await findBlocks();
+
+    const currentBlocksArray = JSON.parse(currentBlocksString);
+
+    const lastBlock = currentBlocksArray[currentBlocksArray.length - 1];
+
+    if(currentBlocksArray.length === 0) {
+        return null;
+    }else {
+        return lastBlock;
+    }
 }
 
 /**
@@ -62,20 +68,35 @@ export async function findLastBlock() {
  */
 export async function createBlock(contenu) {
 
-    // VERIFIER SI CEST LE PREMIER BLOC, SI OUI ON CREER LE HASH AVEC MON SECRET
-    // SI CEST PAS LE PREMIER ON RECUP L'ANCIEN HACK ET ON UPDATE +1
+    const lastBlock = await findLastBlock();
+    let block;
 
-    const block = {
-        "id": uuid(),
-        "hash": createHash("sha256", monSecret),
-        "date": getDate(),
-        "nom": contenu.nom,
-        "don": contenu.don,
+    console.log("LAST BLOCK : ", lastBlock);
+    console.log("CONTENU : ", contenu);
+
+    if (lastBlock == null) {
+        block = {
+            "id": uuid(),
+            "hash": createHash('sha256').update(monSecret).digest('hex'), // On utilise le secret comme premier hash
+            "date": getDate(),
+            "nom": contenu.nom,
+            "don": contenu.don,
+        };
+    } else {
+        // On convertit le dernier block en string pour l'utiliser comme hash
+        const lastBlockString = JSON.stringify(lastBlock);
+        block = {
+            "id": uuid(),
+            "hash": createHash("sha256").update(lastBlockString).digest("hex"),
+            "date": getDate(),
+            "nom": contenu.nom,
+            "don": contenu.don,
+        };
     }
 
     const currentBlocks = await findBlocks();
     const currentBlocksJSON = JSON.parse(currentBlocks);
-    const blocksAdded =   [block, ...currentBlocksJSON]
+    const blocksAdded =   [...currentBlocksJSON, block]
     writeFile(path, JSON.stringify(blocksAdded));
     return blocksAdded;
 }
