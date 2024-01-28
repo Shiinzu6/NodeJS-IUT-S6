@@ -2,7 +2,7 @@ import {readFile, writeFile} from 'node:fs/promises'
 import {getDate, monSecret} from "./divers.js";
 import {NotFoundError} from "./errors.js";
 import {createHash} from 'node:crypto'
-import { uuid } from 'uuidv4';
+import { v4 as uuidv4 } from 'uuid';
 
 /* Chemin de stockage des blocks */
 const path = "data/blockchain.json"
@@ -76,7 +76,7 @@ export async function createBlock(contenu) {
 
     if (lastBlock == null) {
         block = {
-            "id": uuid(),
+            "id": uuidv4(),
             "hash": createHash('sha256').update(monSecret).digest('hex'), // On utilise le secret comme premier hash
             "date": getDate(),
             "nom": contenu.nom,
@@ -86,7 +86,7 @@ export async function createBlock(contenu) {
         // On convertit le dernier block en string pour l'utiliser comme hash
         const lastBlockString = JSON.stringify(lastBlock);
         block = {
-            "id": uuid(),
+            "id": uuidv4(),
             "hash": createHash("sha256").update(lastBlockString).digest("hex"),
             "date": getDate(),
             "nom": contenu.nom,
@@ -98,6 +98,6 @@ export async function createBlock(contenu) {
     const currentBlocksJSON = JSON.parse(currentBlocks);
     const blocksAdded =   [...currentBlocksJSON, block]
     writeFile(path, JSON.stringify(blocksAdded));
-    return blocksAdded;
+    return block;
 }
 

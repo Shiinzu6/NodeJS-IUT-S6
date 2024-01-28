@@ -24,8 +24,6 @@ createServer(async (req, res) => {
                     res.writeHead(404)
             }
             if (results) {
-                // const resultJson = JSON.parse(results)
-                // console.log("RESULT JSON : ", resultJson)
                 res.write(JSON.stringify(results))
             }
         } catch (erreur) {
